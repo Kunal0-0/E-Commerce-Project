@@ -4,6 +4,13 @@ const User = require("../models/user");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const cookieParser = require("cookie-parser");
+const {
+  registerUser,
+  handleGetAllUsers,
+  handleGetUserById,
+  updateUser,
+  deleteUser,
+} = require("../controllers/user");
 
 const app = express();
 
@@ -11,63 +18,16 @@ app.use(express.json());
 app.use(cookieParser());
 
 // Create User (Register)
-router.post("/register", async (req, res) => {
-  try {
-    const { mobile_number, name, password } = req.body;
-    const user = new User({ mobile_number, name, password });
-    await user.save();
-    res.status(201).json({ message: "User created", user });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+router.post("/register", registerUser);
 
 // Read All Users
-router.get("/", async (req, res) => {
-  try {
-    const users = await User.find();
-    res.status(200).json(users);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+router.get("/", handleGetAllUsers);
 
-// Read User by ID
-router.get("/:id", async (req, res) => {
-  try {
-    const user = await User.findById(req.params.id);
-    if (!user) return res.status(404).json({ message: "User not found" });
-    res.status(200).json(user);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Update User by ID
-router.put("/:id", async (req, res) => {
-  try {
-    const updatedUser = await User.findByIdAndUpdate(req.params.id, req.body, {
-      new: true,
-    });
-    if (!updatedUser)
-      return res.status(404).json({ message: "User not found" });
-    res.status(200).json(updatedUser);
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
-
-// Delete User by ID
-router.delete("/:id", async (req, res) => {
-  try {
-    const deletedUser = await User.findByIdAndDelete(req.params.id);
-    if (!deletedUser)
-      return res.status(404).json({ message: "User not found" });
-    res.status(200).json({ message: "User deleted" });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
-  }
-});
+router
+  .route("/:id")
+  .get(handleGetUserById) // Read User by ID
+  .put(updateUser) // Update User by ID
+  .delete(deleteUser); // Delete User by ID
 
 // Generate Access and Refresh Tokens
 const generateTokens = (user) => {
