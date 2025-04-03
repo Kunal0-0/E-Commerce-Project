@@ -1,13 +1,13 @@
 const User = require("../models/user");
 
 async function registerUser(req, res, next) {
-  const { mobile_number, name, password } = req.body;
-  if (!mobile_number || !name || !password) {
+  const { mobile_number, name, password, email } = req.body;
+  if (!mobile_number || !name || !password || !email) {
     const error = new Error("All fields are required");
     error.statusCode = 400;
     return next(error);
   }
-  const user = new User({ mobile_number, name, password });
+  const user = new User({ mobile_number, name, password, email });
   await user.save();
   res.status(201).json({ message: "User created", user });
 }

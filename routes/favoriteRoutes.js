@@ -6,3 +6,5 @@ const { addToFavorites, removeFromFavorites, getFavorites } = require("../contro
 router.post("/", addToFavorites);
 router.get("/:userId", getFavorites);
 router.delete("/:productId", removeFromFavorites);
+
+module.exports = router;
