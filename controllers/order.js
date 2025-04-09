@@ -2,7 +2,8 @@ const Order = require("../models/order");
 
 // create a new order
 async function createOrder(req, res, next) {
-  const { userId, items, address, paymentMethod } = req.body;
+  const { userId, items, address, paymentStatus,
+    orderStatus,paymentMethod } = req.body;
 
   if (!userId || !items || !address || !paymentMethod) {
     const error = new Error("All fields are required");
@@ -19,13 +20,13 @@ async function createOrder(req, res, next) {
     userId,
     items,
     address,
+    paymentStatus,
+    orderStatus,
     paymentMethod,
-    paymentStatus: "Pending",
-    orderStatus: "Processing",
   });
 
   await order.save();
-  res.status(201).json({ message: "Order placed successfully", order });
+  res.status(201).json({ message: "Order placed successfully", order, totalAmount });
 }
 
 // get all orders for a user
@@ -55,11 +56,11 @@ async function getOrderDetails(req, res, next) {
 // Update order status
 async function updateOrderStatus(req, res, next) {
   const { id } = req.params;
-  const { orderStatus, paymentStatus } = req.body;
+  const { items, orderStatus, paymentStatus } = req.body;
 
   const updatedOrder = await Order.findByIdAndUpdate(
     id,
-    { orderStatus, paymentStatus },
+    { items, orderStatus, paymentStatus },
     { new: true }
   );
 

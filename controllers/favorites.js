@@ -1,29 +1,38 @@
 const Favorites = require("../models/favorites");
+const mongoose = require("mongoose");
 
 // addToFavorites
 async function addToFavorites(req, res, next) {
-  const { userId, product  } = req.body;
+  const { userId, product } = req.body;
 
-  if (!userId || !product) {
-    const error = new Error("User ID and Product ID are required");
+  if (!userId || !product || !Array.isArray(product)) {
+    const error = new Error("User ID and Product ID(s) are required");
     error.statusCode = 400;
     return next(error);
   }
 
+  const productIds = product.map((id) => new mongoose.Types.ObjectId(id));
   let favorite = await Favorites.findOne({ userId });
 
   if (!favorite) {
-    // Create a new favorite document if the user doesn't have one
-    favorite = new Favorites({ userId, products: [product] });
+    // Create new favorite doc
+    favorite = new Favorites({ userId, products: productIds });
   } else {
-    // Prevent adding duplicate products
-    if (favorite.products.includes(product)) {
-      const error = new Error("Product is already in favorites");
+    // Avoid duplicates
+    const existingProductIds = favorite.products.map(id => id.toString());
+    const newProducts = productIds.filter(
+      (id) => !existingProductIds.includes(id.toString())
+    );
+
+    if (newProducts.length === 0) {
+      const error = new Error("All products already in favorites");
       error.statusCode = 400;
       return next(error);
     }
-    favorite.products.push(product);
+
+    favorite.products.push(...newProducts);
   }
+
   await favorite.save();
   res.status(201).json({ message: "Added to favorites", favorite });
 }
@@ -47,6 +56,12 @@ async function getFavorites(req, res, next) {
 async function removeFromFavorites(req, res, next) {
   const { userId, product } = req.body;
 
+  if (!userId || !product) {
+    const error = new Error("User ID and Product ID are required");
+    error.statusCode = 400;
+    return next(error);
+  }
+
   const favorite = await Favorites.findOne({ userId });
 
   if (!favorite) {
@@ -65,6 +80,7 @@ async function removeFromFavorites(req, res, next) {
 
   await favorite.save();
   res.status(200).json({ message: "Product removed from favorites", favorite });
+  
 }
 
 module.exports = {

@@ -11,7 +11,9 @@ async function createCategory(req, res, next) {
   }
   const category = new Category({ name, description });
   await category.save();
-  res.status(201).json({ success: true, message: "Category created", category });
+  res
+    .status(201)
+    .json({ success: true, message: "Category created", category });
 }
 
 // Get all categories
@@ -22,8 +24,8 @@ async function getAllCategories(req, res, next) {
 
 // Update category
 async function updateCategory(req, res, next) {
-  const updatedCategory = await Address.findByIdAndUpdate(
-    req.params.id,
+  const updatedCategory = await Category.findByIdAndUpdate(
+    req.params.categoryId,
     req.body,
     {
       new: true,
@@ -34,12 +36,14 @@ async function updateCategory(req, res, next) {
     error.statusCode = 404;
     return next(error);
   }
-  res.status(200).json({ success: true, message: "Category updated", updatedCategory });
+  res
+    .status(200)
+    .json({ success: true, message: "Category updated", updatedCategory });
 }
 
 // Delete a category
 async function deleteCategory(req, res, next) {
-  const deletedCategory = await User.findByIdAndDelete(req.params.id);
+  const deletedCategory = await Category.findByIdAndDelete(req.params.categoryId);
   if (!deletedCategory) {
     const error = new Error("Category not found");
     error.statusCode = 404;

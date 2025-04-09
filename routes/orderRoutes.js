@@ -11,10 +11,10 @@ router.get("/:userId", getUserOrders);
 // Get details of a single order
 router.get("/details/:id", getOrderDetails);
 
-// Update order status
+
 router
     .route("/:id")
-    .put(updateOrderStatus)
+    .put(updateOrderStatus) // Update order status
     .delete(deleteOrder)
     
 module.exports = router;
