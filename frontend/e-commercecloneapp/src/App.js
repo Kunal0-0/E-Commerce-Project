@@ -1,20 +1,14 @@
-// App.js
 import React from 'react';
-import Navbar from './components/Navbar';
-// import SignUpForm from './components/SignUpForm';
-import ImageSection from './components/ImageSection';
-// import Footer from './components/Footer';
+import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
+import Header from './components/Header';
 
 function App() {
   return (
-    <div className="App">
-      <Navbar />
-      <main className="flex flex-col md:flex-row min-h-screen items-start"> 
-        <ImageSection />
-        {/* <SignUpForm /> */}
-      </main>
-      {/* <Footer /> */}
-    </div>
+    <Router>
+      <div className="flex flex-col min-h-screen">
+        <Header />
+      </div>
+    </Router>
   );
 }
 
